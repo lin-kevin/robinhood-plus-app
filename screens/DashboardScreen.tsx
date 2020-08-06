@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Text, View, FlatList, Linking, StyleSheet } from "react-native";
+import NumberFormat from "react-number-format";
 
 import alpacaAPI from "../services/alpaca";
 import polygonAPI from "../services/polygon";
@@ -9,15 +10,15 @@ interface Props {}
 interface Symbols {}
 
 interface State {
-  buying_power: Number;
-  cash: Number;
-  long_market_value: Number;
-  portfolio_value: Number;
+  buying_power: number;
+  cash: number;
+  long_market_value: number;
+  portfolio_value: number;
   positions: Array<any>;
-  DIA: Number;
-  SPY: Number;
-  QQQ: Number;
-  IWM: Number;
+  DIA: number;
+  SPY: number;
+  QQQ: number;
+  IWM: number;
 }
 
 const testURL =
@@ -66,7 +67,6 @@ class DashboardScreen extends React.Component<Props, State> {
 
     symbols.map((symbol) => {
       polygon.getQuote(symbol).then((response: any) => {
-        
         if (symbol == "DIA")
           this.setState({ DIA: response.data.ticker.lastTrade.p });
         if (symbol == "SPY")
@@ -100,23 +100,41 @@ class DashboardScreen extends React.Component<Props, State> {
     return (
       <View style={styles.container}>
         <Text style={styles.equity}>Investing</Text>
-        <Text style={styles.equity}>{this.state.portfolio_value}</Text>
-        <View style={styles.chart}>
-          <Text>Filler</Text>
-        </View>
+        <NumberFormat
+          value={this.state.portfolio_value}
+          displayType={"text"}
+          thousandSeparator={true}
+          prefix={"$"}
+          renderText={(value) => <Text style={styles.equity}>{value}</Text>}
+        />
+        <View style={styles.chart}></View>
         <View>
           <View style={styles.buyingPowerContainer}>
             <Text>Buying Power</Text>
-            <Text>{this.state.buying_power}</Text>
+            <NumberFormat
+              value={this.state.buying_power}
+              displayType={"text"}
+              thousandSeparator={true}
+              prefix={"$"}
+              renderText={(value) => <Text>{value}</Text>}
+            />
           </View>
           <Text>Cash</Text>
           <Text>{this.state.cash}</Text>
         </View>
-        <View>
-          <Text>DIA: {this.state.DIA}</Text>
-          <Text>SPY: {this.state.SPY}</Text>
-          <Text>QQQ: {this.state.QQQ}</Text>
-          <Text>IWM: {this.state.IWM}</Text>
+        <View style={styles.featuredContainer}>
+          <View style={styles.featured}>
+            <Text>DIA: {this.state.DIA}</Text>
+          </View>
+          <View style={styles.featured}>
+            <Text>SPY: {this.state.SPY}</Text>
+          </View>
+          <View style={styles.featured}>
+            <Text>QQQ: {this.state.QQQ}</Text>
+          </View>
+          <View style={styles.featured}>
+            <Text>IWM: {this.state.IWM}</Text>
+          </View>
         </View>
 
         <View>
@@ -141,21 +159,34 @@ class DashboardScreen extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     marginLeft: 10,
+    marginRight: 10,
   },
   equity: {
     fontSize: 30,
   },
   chart: {
-    borderColor: "blue",
+    height: 200,
   },
   buyingPowerContainer: {
     flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  featuredContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  featured: {
+    height: 80,
+    width: 80,
+    padding: 5,
+    alignItems: "center",
+    backgroundColor: "green",
   },
   positions: {
     flex: 1,
     flexDirection: "row",
-    margin: 5,
     padding: 5,
+    backgroundColor: "red",
   },
   positionsLeftContainer: {
     flex: 4,
