@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Text, View, FlatList, StyleSheet, Dimensions } from "react-native";
 import NumberFormat from "react-number-format";
+import { Ionicons } from "@expo/vector-icons";
 
 import alpacaAPI from "../services/alpaca";
 
@@ -19,7 +20,6 @@ interface State {
 }
 
 const screenWidth = Math.round(Dimensions.get("window").width);
-const screenHeight = Math.round(Dimensions.get("window").height);
 const symbols = ["DIA", "SPY", "QQQ", "IWM"];
 
 class DashboardScreen extends React.Component<Props, State> {
@@ -74,17 +74,43 @@ class DashboardScreen extends React.Component<Props, State> {
         this.setState({ iwm_price: item.current_price });
       return <View></View>;
     }
+
+    var positive = item.change_today > 0;
+    var icon = positive ? (
+      <Ionicons name="md-arrow-dropup"></Ionicons>
+    ) : (
+      <Ionicons name="md-arrow-dropdown"></Ionicons>
+    );
+
     return (
       <View key={item.asset_id} style={styles.positions}>
         <View style={styles.positionsLeftContainer}>
-          <Text>{item.symbol}</Text>
-          <Text>
-            {item.qty} @ {item.avg_entry_price}
-          </Text>
+          <Text style={styles.positionsSymbol}>{item.symbol}</Text>
+          <View style={styles.positionsBottomContainer}>
+            <Text>{item.qty} shares at </Text>
+            <NumberFormat
+              value={item.avg_entry_price}
+              displayType={"text"}
+              thousandSeparator={true}
+              prefix={"$"}
+              renderText={(value) => <Text>{value}</Text>}
+            />
+          </View>
         </View>
         <View style={styles.positionsRightContainer}>
-          <Text>{item.current_price}</Text>
-          <Text>{(item.change_today * 100).toFixed(2)}</Text>
+          <NumberFormat
+            value={item.current_price}
+            displayType={"text"}
+            thousandSeparator={true}
+            prefix={"$"}
+            renderText={(value) => <Text>{value}</Text>}
+          />
+          <View style={styles.positionsBottomContainer}>
+            <Text style={{ color: positive ? "green" : "red" }}>
+              {icon}
+              {(item.change_today * 100).toFixed(2)}%
+            </Text>
+          </View>
         </View>
       </View>
     );
@@ -220,7 +246,7 @@ const styles = StyleSheet.create({
     height: 100,
     width: (screenWidth - 60) / 4,
     borderRadius: 10,
-    marginVertical: 10,
+    marginTop: 10,
     padding: 5,
     alignItems: "center",
     backgroundColor: "green",
@@ -240,11 +266,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: "white",
   },
+  positionsSymbol: {
+    fontWeight: "700",
+  },
   positionsLeftContainer: {
-    flex: 4,
+    flex: 3,
+  },
+  positionsBottomContainer: {
+    flexDirection: "row",
   },
   positionsRightContainer: {
     flex: 1,
+    backgroundColor: "rgb(230, 230, 230)",
+    alignItems: "center",
+    borderRadius: 10,
   },
 });
 
