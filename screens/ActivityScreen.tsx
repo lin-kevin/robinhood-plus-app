@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 
 import alpacaAPI from "../services/alpaca";
 
@@ -8,6 +8,9 @@ interface Props {}
 interface State {
   activities: Array<any>;
 }
+
+const screenWidth = Math.round(Dimensions.get("window").width);
+const screenHeight = Math.round(Dimensions.get("window").height);
 
 class ActivityScreen extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -33,7 +36,7 @@ class ActivityScreen extends React.Component<Props, State> {
     return (
       <View style={styles.container}>
         {this.state.activities.map((activity) => (
-          <View>
+          <View style={styles.elementContainer}>
             <Text>{activity.symbol}</Text>
             <Text>
               {activity.side} {activity.qty} @ {activity.price}
@@ -49,6 +52,11 @@ class ActivityScreen extends React.Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginHorizontal: 10,
+    marginVertical: 10,
+  },
+  elementContainer: {
+    width: screenWidth,
   },
 });
 

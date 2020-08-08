@@ -1,5 +1,12 @@
 import * as React from "react";
-import { Text, View, FlatList, Linking, StyleSheet } from "react-native";
+import {
+  Text,
+  View,
+  FlatList,
+  Linking,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import NumberFormat from "react-number-format";
 
 import alpacaAPI from "../services/alpaca";
@@ -21,8 +28,8 @@ interface State {
   IWM: number;
 }
 
-const testURL =
-  "https://us-east4-airy-advantage-285512.cloudfunctions.net/robinhood-plus";
+const screenWidth = Math.round(Dimensions.get("window").width);
+const screenHeight = Math.round(Dimensions.get("window").height);
 
 class DashboardScreen extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -119,21 +126,65 @@ class DashboardScreen extends React.Component<Props, State> {
               renderText={(value) => <Text>{value}</Text>}
             />
           </View>
-          <Text>Cash</Text>
-          <Text>{this.state.cash}</Text>
+          <View style={styles.buyingPowerContainer}>
+            <Text>Cash</Text>
+            <NumberFormat
+              value={this.state.cash}
+              displayType={"text"}
+              thousandSeparator={true}
+              prefix={"$"}
+              renderText={(value) => <Text>{value}</Text>}
+            />
+          </View>
         </View>
         <View style={styles.featuredContainer}>
           <View style={styles.featured}>
-            <Text>DIA: {this.state.DIA}</Text>
+            <Text style={styles.featuredSymbol}>DIA</Text>
+            <NumberFormat
+              value={this.state.DIA}
+              displayType={"text"}
+              thousandSeparator={true}
+              prefix={"$"}
+              renderText={(value) => (
+                <Text style={styles.featuredPrice}>{value}</Text>
+              )}
+            />
           </View>
           <View style={styles.featured}>
-            <Text>SPY: {this.state.SPY}</Text>
+            <Text style={styles.featuredSymbol}>SPY</Text>
+            <NumberFormat
+              value={this.state.SPY}
+              displayType={"text"}
+              thousandSeparator={true}
+              prefix={"$"}
+              renderText={(value) => (
+                <Text style={styles.featuredPrice}>{value}</Text>
+              )}
+            />
           </View>
           <View style={styles.featured}>
-            <Text>QQQ: {this.state.QQQ}</Text>
+            <Text style={styles.featuredSymbol}>QQQ</Text>
+            <NumberFormat
+              value={this.state.QQQ}
+              displayType={"text"}
+              thousandSeparator={true}
+              prefix={"$"}
+              renderText={(value) => (
+                <Text style={styles.featuredPrice}>{value}</Text>
+              )}
+            />
           </View>
           <View style={styles.featured}>
-            <Text>IWM: {this.state.IWM}</Text>
+            <Text style={styles.featuredSymbol}>IWM</Text>
+            <NumberFormat
+              value={this.state.IWM}
+              displayType={"text"}
+              thousandSeparator={true}
+              prefix={"$"}
+              renderText={(value) => (
+                <Text style={styles.featuredPrice}>{value}</Text>
+              )}
+            />
           </View>
         </View>
 
@@ -144,13 +195,7 @@ class DashboardScreen extends React.Component<Props, State> {
             keyExtractor={(item) => item.asset_id}
           ></FlatList>
         </View>
-
-        <Text
-          style={{ color: "blue" }}
-          onPress={() => Linking.openURL(testURL)}
-        >
-          Test Python
-        </Text>
+        
       </View>
     );
   }
@@ -158,8 +203,8 @@ class DashboardScreen extends React.Component<Props, State> {
 
 const styles = StyleSheet.create({
   container: {
-    marginLeft: 10,
-    marginRight: 10,
+    marginHorizontal: 10,
+    marginVertical: 10,
   },
   equity: {
     fontSize: 30,
@@ -176,17 +221,27 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   featured: {
-    height: 80,
-    width: 80,
+    height: 100,
+    width: (screenWidth - 60) / 4,
+    borderRadius: 10,
+    marginVertical: 10,
     padding: 5,
     alignItems: "center",
     backgroundColor: "green",
+  },
+  featuredSymbol: {
+    fontSize: 30,
+    color: "white",
+  },
+  featuredPrice: {
+    color: "white",
   },
   positions: {
     flex: 1,
     flexDirection: "row",
     padding: 5,
-    backgroundColor: "red",
+    borderRadius: 10,
+    backgroundColor: "white",
   },
   positionsLeftContainer: {
     flex: 4,

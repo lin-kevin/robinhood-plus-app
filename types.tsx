@@ -6,7 +6,7 @@ export type RootStackParamList = {
 export type BottomTabParamList = {
   Dashboard: undefined;
   Activity: undefined;
-  Search: undefined;
+  Trade: undefined;
   Settings: undefined;
 };
 
@@ -18,8 +18,8 @@ export type ActivityParamList = {
   ActivityScreen: undefined;
 };
 
-export type SearchParamList = {
-  SearchScreen: undefined;
+export type TradeParamList = {
+  TradeScreen: undefined;
 };
 
 export type SettingsParamList = {

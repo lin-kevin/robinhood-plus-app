@@ -7,13 +7,13 @@ import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import DashboardScreen from "../screens/DashboardScreen";
 import ActivityScreen from "../screens/ActivityScreen";
-import SearchScreen from "../screens/SearchScreen";
+import TradeScreen from "../screens/TradeScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import {
   BottomTabParamList,
   DashboardParamList,
   ActivityParamList,
-  SearchParamList,
+  TradeParamList,
   SettingsParamList,
 } from "../types";
 
@@ -46,11 +46,11 @@ export default function BottomTabNavigator() {
         }}
       />
       <BottomTab.Screen
-        name="Search"
-        component={SearchNavigator}
+        name="Trade"
+        component={TradeNavigator}
         options={{
           tabBarIcon: ({ color }) => (
-            <TabBarIcon name="ios-search" color={color} />
+            <TabBarIcon name="ios-cash" color={color} />
           ),
         }}
       />
@@ -103,17 +103,17 @@ function ActivityNavigator() {
   );
 }
 
-const SearchStack = createStackNavigator<SearchParamList>();
+const TradeStack = createStackNavigator<TradeParamList>();
 
-function SearchNavigator() {
+function TradeNavigator() {
   return (
-    <SearchStack.Navigator>
-      <SearchStack.Screen
-        name="SearchScreen"
-        component={SearchScreen}
-        options={{ headerTitle: "Search" }}
+    <TradeStack.Navigator>
+      <TradeStack.Screen
+        name="TradeScreen"
+        component={TradeScreen}
+        options={{ headerTitle: "Trading Bots" }}
       />
-    </SearchStack.Navigator>
+    </TradeStack.Navigator>
   );
 }
 
