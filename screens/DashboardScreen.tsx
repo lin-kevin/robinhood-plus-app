@@ -1,20 +1,10 @@
 import * as React from "react";
-import {
-  Text,
-  View,
-  FlatList,
-  Linking,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
+import { Text, View, FlatList, StyleSheet, Dimensions } from "react-native";
 import NumberFormat from "react-number-format";
 
 import alpacaAPI from "../services/alpaca";
-import polygonAPI from "../services/polygon";
 
 interface Props {}
-
-interface Symbols {}
 
 interface State {
   buying_power: number;
@@ -22,14 +12,15 @@ interface State {
   long_market_value: number;
   portfolio_value: number;
   positions: Array<any>;
-  DIA: number;
-  SPY: number;
-  QQQ: number;
-  IWM: number;
+  dia_price: number;
+  spy_price: number;
+  qqq_price: number;
+  iwm_price: number;
 }
 
 const screenWidth = Math.round(Dimensions.get("window").width);
 const screenHeight = Math.round(Dimensions.get("window").height);
+const symbols = ["DIA", "SPY", "QQQ", "IWM"];
 
 class DashboardScreen extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -41,10 +32,10 @@ class DashboardScreen extends React.Component<Props, State> {
       long_market_value: 0,
       portfolio_value: 0,
       positions: [],
-      DIA: 0,
-      SPY: 0,
-      QQQ: 0,
-      IWM: 0,
+      dia_price: 0,
+      spy_price: 0,
+      qqq_price: 0,
+      iwm_price: 0,
     };
   }
 
@@ -62,31 +53,27 @@ class DashboardScreen extends React.Component<Props, State> {
     });
 
     api.getPositions().then((response: any) => {
+      console.log(response);
       if (response.ok) {
         this.setState({
           positions: response.data,
         });
       }
     });
-
-    const symbols = ["DIA", "SPY", "QQQ", "IWM"];
-    const polygon = polygonAPI();
-
-    symbols.map((symbol) => {
-      polygon.getQuote(symbol).then((response: any) => {
-        if (symbol == "DIA")
-          this.setState({ DIA: response.data.ticker.lastTrade.p });
-        if (symbol == "SPY")
-          this.setState({ SPY: response.data.ticker.lastTrade.p });
-        if (symbol == "QQQ")
-          this.setState({ QQQ: response.data.ticker.lastTrade.p });
-        if (symbol == "IWM")
-          this.setState({ IWM: response.data.ticker.lastTrade.p });
-      });
-    });
   }
 
   renderRow = ({ item }) => {
+    if (item.symbol in symbols) {
+      if (item.symbol == "DIA")
+        this.setState({ dia_price: item.current_price });
+      if (item.symbol == "SPY")
+        this.setState({ spy_price: item.current_price });
+      if (item.symbol == "QQQ")
+        this.setState({ qqq_price: item.current_price });
+      if (item.symbol == "IWM")
+        this.setState({ iwm_price: item.current_price });
+      return <View></View>;
+    }
     return (
       <View key={item.asset_id} style={styles.positions}>
         <View style={styles.positionsLeftContainer}>
@@ -137,57 +124,60 @@ class DashboardScreen extends React.Component<Props, State> {
             />
           </View>
         </View>
-        <View style={styles.featuredContainer}>
-          <View style={styles.featured}>
-            <Text style={styles.featuredSymbol}>DIA</Text>
+
+        <Text style={styles.header}>Market</Text>
+        <View style={styles.marketContainer}>
+          <View style={styles.market}>
+            <Text style={styles.marketSymbol}>DIA</Text>
             <NumberFormat
-              value={this.state.DIA}
+              value={this.state.dia_price}
               displayType={"text"}
               thousandSeparator={true}
               prefix={"$"}
               renderText={(value) => (
-                <Text style={styles.featuredPrice}>{value}</Text>
+                <Text style={styles.marketPrice}>{value}</Text>
               )}
             />
           </View>
-          <View style={styles.featured}>
-            <Text style={styles.featuredSymbol}>SPY</Text>
+          <View style={styles.market}>
+            <Text style={styles.marketSymbol}>SPY</Text>
             <NumberFormat
-              value={this.state.SPY}
+              value={this.state.spy_price}
               displayType={"text"}
               thousandSeparator={true}
               prefix={"$"}
               renderText={(value) => (
-                <Text style={styles.featuredPrice}>{value}</Text>
+                <Text style={styles.marketPrice}>{value}</Text>
               )}
             />
           </View>
-          <View style={styles.featured}>
-            <Text style={styles.featuredSymbol}>QQQ</Text>
+          <View style={styles.market}>
+            <Text style={styles.marketSymbol}>QQQ</Text>
             <NumberFormat
-              value={this.state.QQQ}
+              value={this.state.qqq_price}
               displayType={"text"}
               thousandSeparator={true}
               prefix={"$"}
               renderText={(value) => (
-                <Text style={styles.featuredPrice}>{value}</Text>
+                <Text style={styles.marketPrice}>{value}</Text>
               )}
             />
           </View>
-          <View style={styles.featured}>
-            <Text style={styles.featuredSymbol}>IWM</Text>
+          <View style={styles.market}>
+            <Text style={styles.marketSymbol}>IWM</Text>
             <NumberFormat
-              value={this.state.IWM}
+              value={this.state.iwm_price}
               displayType={"text"}
               thousandSeparator={true}
               prefix={"$"}
               renderText={(value) => (
-                <Text style={styles.featuredPrice}>{value}</Text>
+                <Text style={styles.marketPrice}>{value}</Text>
               )}
             />
           </View>
         </View>
 
+        <Text style={styles.header}>Stocks</Text>
         <View>
           <FlatList
             data={this.state.positions}
@@ -195,7 +185,6 @@ class DashboardScreen extends React.Component<Props, State> {
             keyExtractor={(item) => item.asset_id}
           ></FlatList>
         </View>
-        
       </View>
     );
   }
@@ -215,12 +204,19 @@ const styles = StyleSheet.create({
   buyingPowerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    paddingVertical: 5,
+    borderBottomColor: "black",
+    borderBottomWidth: 1,
   },
-  featuredContainer: {
+  header: {
+    fontSize: 30,
+    marginTop: 10,
+  },
+  marketContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  featured: {
+  market: {
     height: 100,
     width: (screenWidth - 60) / 4,
     borderRadius: 10,
@@ -229,14 +225,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "green",
   },
-  featuredSymbol: {
+  marketSymbol: {
     fontSize: 30,
     color: "white",
   },
-  featuredPrice: {
+  marketPrice: {
     color: "white",
   },
   positions: {
+    marginVertical: 10,
     flex: 1,
     flexDirection: "row",
     padding: 5,
