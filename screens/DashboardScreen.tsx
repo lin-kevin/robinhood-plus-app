@@ -17,9 +17,14 @@ interface State {
   spy_price: number;
   qqq_price: number;
   iwm_price: number;
+  dia_change: number;
+  spy_change: number;
+  qqq_change: number;
+  iwm_change: number;
 }
 
 const screenWidth = Math.round(Dimensions.get("window").width);
+const screenHeight = Math.round(Dimensions.get("window").height);
 const symbols = ["DIA", "SPY", "QQQ", "IWM"];
 
 class DashboardScreen extends React.Component<Props, State> {
@@ -36,6 +41,10 @@ class DashboardScreen extends React.Component<Props, State> {
       spy_price: 0,
       qqq_price: 0,
       iwm_price: 0,
+      dia_change: 0,
+      spy_change: 0,
+      qqq_change: 0,
+      iwm_change: 0,
     };
   }
 
@@ -53,7 +62,6 @@ class DashboardScreen extends React.Component<Props, State> {
     });
 
     api.getPositions().then((response: any) => {
-      console.log(response);
       if (response.ok) {
         this.setState({
           positions: response.data,
@@ -63,15 +71,21 @@ class DashboardScreen extends React.Component<Props, State> {
   }
 
   renderRow = ({ item }) => {
-    if (item.symbol in symbols) {
-      if (item.symbol == "DIA")
+    if (symbols.includes(item.symbol)) {
+      if (item.symbol === "DIA" && this.state.dia_price == 0) {
         this.setState({ dia_price: item.current_price });
-      if (item.symbol == "SPY")
+        this.setState({ dia_change: item.change_today });
+      } else if (item.symbol == "SPY" && this.state.spy_price == 0) {
         this.setState({ spy_price: item.current_price });
-      if (item.symbol == "QQQ")
+        this.setState({ spy_change: item.change_today });
+      } else if (item.symbol == "QQQ" && this.state.qqq_price == 0) {
         this.setState({ qqq_price: item.current_price });
-      if (item.symbol == "IWM")
+        this.setState({ qqq_change: item.change_today });
+      } else if (item.symbol == "IWM" && this.state.iwm_price == 0) {
         this.setState({ iwm_price: item.current_price });
+        this.setState({ iwm_change: item.change_today });
+      }
+
       return <View></View>;
     }
 
@@ -81,6 +95,17 @@ class DashboardScreen extends React.Component<Props, State> {
     ) : (
       <Ionicons name="md-arrow-dropdown"></Ionicons>
     );
+    var change = positive
+      ? (item.change_today * 100).toFixed(2)
+      : (item.change_today * 100).toFixed(2).toString().substr(1, 4);
+    var avg_entry_price =
+      (item.avg_entry_price * 100) % 10 != 0
+        ? item.avg_entry_price
+        : item.avg_entry_price + 0.01;
+    var current_price =
+      (item.current_price * 100) % 10 != 0
+        ? item.current_price
+        : item.current_price + 0.01;
 
     return (
       <View key={item.asset_id} style={styles.positions}>
@@ -89,7 +114,7 @@ class DashboardScreen extends React.Component<Props, State> {
           <View style={styles.positionsBottomContainer}>
             <Text>{item.qty} shares at </Text>
             <NumberFormat
-              value={item.avg_entry_price}
+              value={avg_entry_price}
               displayType={"text"}
               thousandSeparator={true}
               prefix={"$"}
@@ -99,16 +124,16 @@ class DashboardScreen extends React.Component<Props, State> {
         </View>
         <View style={styles.positionsRightContainer}>
           <NumberFormat
-            value={item.current_price}
+            value={current_price}
             displayType={"text"}
             thousandSeparator={true}
             prefix={"$"}
             renderText={(value) => <Text>{value}</Text>}
           />
           <View style={styles.positionsBottomContainer}>
-            <Text style={{ color: positive ? "green" : "red" }}>
+            <Text style={{ color: positive ? "green" : "darkred" }}>
               {icon}
-              {(item.change_today * 100).toFixed(2)}%
+              {change}%
             </Text>
           </View>
         </View>
@@ -117,6 +142,46 @@ class DashboardScreen extends React.Component<Props, State> {
   };
 
   render() {
+    var dia_positive = this.state.dia_change > 0;
+    var dia_icon = dia_positive ? (
+      <Ionicons name="md-arrow-dropup"></Ionicons>
+    ) : (
+      <Ionicons name="md-arrow-dropdown"></Ionicons>
+    );
+    var dia_change = dia_positive
+      ? (this.state.dia_change * 100).toFixed(2)
+      : (this.state.dia_change * 100).toFixed(2).toString().substr(1, 4);
+
+    var spy_positive = this.state.spy_change > 0;
+    var spy_icon = spy_positive ? (
+      <Ionicons name="md-arrow-dropup"></Ionicons>
+    ) : (
+      <Ionicons name="md-arrow-dropdown"></Ionicons>
+    );
+    var spy_change = spy_positive
+      ? (this.state.spy_change * 100).toFixed(2)
+      : (this.state.spy_change * 100).toFixed(2).toString().substr(1, 4);
+
+    var qqq_positive = this.state.qqq_change > 0;
+    var qqq_icon = qqq_positive ? (
+      <Ionicons name="md-arrow-dropup"></Ionicons>
+    ) : (
+      <Ionicons name="md-arrow-dropdown"></Ionicons>
+    );
+    var qqq_change = qqq_positive
+      ? (this.state.qqq_change * 100).toFixed(2)
+      : (this.state.qqq_change * 100).toFixed(2).toString().substr(1, 4);
+
+    var iwm_positive = this.state.iwm_change > 0;
+    var iwm_icon = iwm_positive ? (
+      <Ionicons name="md-arrow-dropup"></Ionicons>
+    ) : (
+      <Ionicons name="md-arrow-dropdown"></Ionicons>
+    );
+    var iwm_change = iwm_positive
+      ? (this.state.iwm_change * 100).toFixed(2)
+      : (this.state.iwm_change * 100).toFixed(2).toString().substr(1, 4);
+
     return (
       <View style={styles.container}>
         <Text style={styles.equity}>Investing</Text>
@@ -153,7 +218,12 @@ class DashboardScreen extends React.Component<Props, State> {
 
         <Text style={styles.header}>Market</Text>
         <View style={styles.marketContainer}>
-          <View style={styles.market}>
+          <View
+            style={[
+              styles.market,
+              { backgroundColor: dia_positive ? "green" : "darkred" },
+            ]}
+          >
             <Text style={styles.marketSymbol}>DIA</Text>
             <NumberFormat
               value={this.state.dia_price}
@@ -164,8 +234,17 @@ class DashboardScreen extends React.Component<Props, State> {
                 <Text style={styles.marketPrice}>{value}</Text>
               )}
             />
+            <Text style={styles.marketPrice}>
+              {dia_icon}
+              {dia_change}%
+            </Text>
           </View>
-          <View style={styles.market}>
+          <View
+            style={[
+              styles.market,
+              { backgroundColor: spy_positive ? "green" : "darkred" },
+            ]}
+          >
             <Text style={styles.marketSymbol}>SPY</Text>
             <NumberFormat
               value={this.state.spy_price}
@@ -176,8 +255,17 @@ class DashboardScreen extends React.Component<Props, State> {
                 <Text style={styles.marketPrice}>{value}</Text>
               )}
             />
+            <Text style={styles.marketPrice}>
+              {spy_icon}
+              {spy_change}%
+            </Text>
           </View>
-          <View style={styles.market}>
+          <View
+            style={[
+              styles.market,
+              { backgroundColor: qqq_positive ? "green" : "darkred" },
+            ]}
+          >
             <Text style={styles.marketSymbol}>QQQ</Text>
             <NumberFormat
               value={this.state.qqq_price}
@@ -188,8 +276,17 @@ class DashboardScreen extends React.Component<Props, State> {
                 <Text style={styles.marketPrice}>{value}</Text>
               )}
             />
+            <Text style={styles.marketPrice}>
+              {qqq_icon}
+              {qqq_change}%
+            </Text>
           </View>
-          <View style={styles.market}>
+          <View
+            style={[
+              styles.market,
+              { backgroundColor: iwm_positive ? "green" : "darkred" },
+            ]}
+          >
             <Text style={styles.marketSymbol}>IWM</Text>
             <NumberFormat
               value={this.state.iwm_price}
@@ -200,11 +297,15 @@ class DashboardScreen extends React.Component<Props, State> {
                 <Text style={styles.marketPrice}>{value}</Text>
               )}
             />
+            <Text style={styles.marketPrice}>
+              {iwm_icon}
+              {iwm_change}%
+            </Text>
           </View>
         </View>
 
         <Text style={styles.header}>Stocks</Text>
-        <View>
+        <View style={styles.positionsContainer}>
           <FlatList
             data={this.state.positions}
             renderItem={this.renderRow}
@@ -225,7 +326,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   chart: {
-    height: 200,
+    height: 190,
   },
   buyingPowerContainer: {
     flexDirection: "row",
@@ -249,14 +350,17 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 5,
     alignItems: "center",
-    backgroundColor: "green",
   },
   marketSymbol: {
     fontSize: 30,
     color: "white",
+    marginBottom: 15,
   },
   marketPrice: {
     color: "white",
+  },
+  positionsContainer: {
+    height: 190,
   },
   positions: {
     marginVertical: 10,

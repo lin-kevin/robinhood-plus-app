@@ -12,6 +12,7 @@ interface State {
 
 const screenWidth = Math.round(Dimensions.get("window").width);
 const screenHeight = Math.round(Dimensions.get("window").height);
+const symbols = ["DIA", "SPY", "QQQ", "IWM"];
 
 class ActivityScreen extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -34,15 +35,21 @@ class ActivityScreen extends React.Component<Props, State> {
   }
 
   renderRow = ({ item }) => {
-    var side = item.side.toUpperCase()
+    var side = item.side.toUpperCase();
     var transaction_date = item.transaction_time.substr(0, 10);
     var transaction_time = item.transaction_time.substr(12, 7);
+    if (symbols.includes(item.symbol)) {
+      return <View></View>;
+    }
+
     return (
       <View style={styles.element}>
         <View style={styles.elementLeftContainer}>
           <Text style={styles.elementSymbol}>{item.symbol}</Text>
           <View style={styles.elementBottomContainer}>
-            <Text>{side} {item.qty} shares at </Text>
+            <Text>
+              {side} {item.qty} shares at{" "}
+            </Text>
             <NumberFormat
               value={item.price}
               displayType={"text"}
