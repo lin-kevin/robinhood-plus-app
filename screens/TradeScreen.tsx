@@ -1,5 +1,15 @@
 import React from "react";
-import { Text, View, Linking, Dimensions, StyleSheet } from "react-native";
+import {
+  Text,
+  View,
+  Linking,
+  Dimensions,
+  FlatList,
+  StyleSheet,
+} from "react-native";
+
+import Strategy from "../components/Strategy";
+import Strategies from "../constants/Strategies";
 
 const testURL =
   "https://us-east4-airy-advantage-285512.cloudfunctions.net/robinhood-plus";
@@ -12,17 +22,20 @@ class TradeScreen extends React.Component {
       <View style={styles.container}>
         <View style={styles.strategies}>
           <Text style={styles.header}>Strategies</Text>
-          <Text
-            style={{ color: "blue" }}
-            onPress={() => Linking.openURL(testURL)}
-          >
-            Test Python
-          </Text>
           <Text>
             (insert all other strategies in FlatList with conditionally rendered
-            descriptions)
-            (data stored in constants/Strategies.ts)
+            descriptions) (data stored in constants/Strategies.ts)
           </Text>
+          <FlatList
+            data={Strategies}
+            renderItem={(itemData) => (
+              <Strategy
+                id={itemData.item.id}
+                strategy={itemData.item}
+                selected={1}
+              />
+            )}
+          />
         </View>
 
         <Text style={styles.header}>Custom </Text>
@@ -38,7 +51,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   strategies: {
-    height: screenHeight/2,
+    height: screenHeight / 2,
   },
   header: {
     fontSize: 30,
