@@ -7,7 +7,9 @@ interface Props {
   selected: number;
 }
 
-interface State {}
+interface State {
+  selected: number;
+}
 
 const screenWidth = Math.round(Dimensions.get("window").width);
 const screenHeight = Math.round(Dimensions.get("window").height);
@@ -17,24 +19,45 @@ class Strategy extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      activities: [],
+      selected: 1,
     };
   }
 
   render() {
     var text = null;
-    if (this.props.selected == this.props.strategy.id)
-      text = <Text>{this.props.strategy.description}</Text>;
+    if (this.state.selected == this.props.strategy.id)
+      text = (
+        <View>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.description}>
+              {this.props.strategy.description}
+            </Text>
+          </View>
+          <View style={styles.footerContainer}>
+            <Text
+              style={styles.footer}
+              onPress={() => Linking.openURL(this.props.strategy.linkURL)}
+            >
+              Execute Trade
+            </Text>
+          </View>
+        </View>
+      );
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>{this.props.strategy.title}</Text>
+        <View style={styles.titleContainer}>
+          <Text
+            style={styles.title}
+            onPress={() =>
+              this.setState({
+                selected: this.props.strategy.id,
+              })
+            }
+          >
+            {this.props.strategy.title}
+          </Text>
+        </View>
         {text}
-        <Text
-          style={{ color: "blue" }}
-          onPress={() => Linking.openURL(this.props.strategy.linkURL)}
-        >
-          {this.props.strategy.linkText}
-        </Text>
       </View>
     );
   }
@@ -45,8 +68,35 @@ const styles = StyleSheet.create({
     flex: 1,
     marginVertical: 10,
   },
+  titleContainer: {
+    backgroundColor: "green",
+    borderRadius: 10,
+    padding: 5,
+    alignItems: "center",
+  },
   title: {
     fontWeight: "700",
+    color: "white",
+  },
+  descriptionContainer: {
+    marginTop: 10,
+    padding: 10,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    backgroundColor: "white",
+  },
+  description: {
+    color: "grey",
+  },
+  footer: {
+    color: "white",
+  },
+  footerContainer: {
+    backgroundColor: "blue",
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    padding: 5,
+    alignItems: "center",
   },
 });
 

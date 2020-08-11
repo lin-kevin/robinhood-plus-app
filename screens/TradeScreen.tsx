@@ -21,11 +21,7 @@ class TradeScreen extends React.Component {
     return (
       <View style={styles.container}>
         <View style={styles.strategies}>
-          <Text style={styles.header}>Strategies</Text>
-          <Text>
-            (insert all other strategies in FlatList with conditionally rendered
-            descriptions) (data stored in constants/Strategies.ts)
-          </Text>
+          <Text style={styles.header}>Trading Bots</Text>
           <FlatList
             data={Strategies}
             renderItem={(itemData) => (

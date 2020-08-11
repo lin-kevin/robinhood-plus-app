@@ -111,7 +111,7 @@ function TradeNavigator() {
       <TradeStack.Screen
         name="TradeScreen"
         component={TradeScreen}
-        options={{ headerTitle: "Trading Bots" }}
+        options={{ headerTitle: "Buy & Sell" }}
       />
     </TradeStack.Navigator>
   );
